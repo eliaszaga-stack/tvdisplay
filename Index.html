@@ -59,22 +59,32 @@
     </div>
 
     <script>
-        // PASTED LINK: Replace the URL below with your actual "Publish to web" CSV link
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1rD_EsgEZXS2pJVjsP2DOWTwtuS4EWbTwCvqx2wsyWPebk2MAQZBDrOEQI8CWFfd1vf4Po6VG5WpA/pub?gid=681098728&single=true&output=csv';
 
         async function updateDashboard() {
             try {
-                const response = await fetch(csvUrl);
+                // Add timestamp to prevent the TV browser from showing old cached numbers
+                const freshUrl = csvUrl + '&t=' + new Date().getTime();
+                const response = await fetch(freshUrl);
                 const data = await response.text();
                 
-                // Break the CSV into rows and cells
-                const rows = data.split('\n');
-                const firstRow = rows[0].split(',');
+                // Safely extract all cells even if numbers contain commas (e.g., "1,250")
+                const values = [];
+                const rows = data.trim().split(/\r?\n/);
+                
+                for (let row of rows) {
+                    // Match CSV cells properly, respecting quotes around formatted numbers
+                    const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                    if (matches) {
+                        for (let cell of matches) {
+                            values.push(cell.replace(/^"|"$/g, '').trim());
+                        }
+                    }
+                }
 
-                // Assigns cell A1 to metric1, and cell B1 to metric2
-                // Clean up quotes or hidden spacing from the sheet data
-                if(firstRow[0]) document.getElementById('metric1').innerText = firstRow[0].replace(/"/g, '').trim();
-                if(firstRow[1]) document.getElementById('metric2').innerText = firstRow[1].replace(/"/g, '').trim();
+                // Display the first two values found anywhere at the top of the sheet
+                if (values[0] !== undefined) document.getElementById('metric1').innerText = values[0];
+                if (values[1] !== undefined) document.getElementById('metric2').innerText = values[1];
                 
             } catch (error) {
                 console.error("Error fetching sheet data:", error);
@@ -85,8 +95,9 @@
         // Run immediately when page loads
         updateDashboard();
 
-        // Check for updates automatically every 1 hour (3600000 milliseconds)
+        // Check for updates automatically every 1 hour
         setInterval(updateDashboard, 3600000);
     </script>
+
 </body>
 </html>
