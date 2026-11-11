@@ -61,17 +61,27 @@
                 const response = await fetch(freshUrl);
                 const text = await response.text();
                 
-                const firstLine = text.trim().split(/\r?\n/).at(0);
-                const cols = firstLine.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+                // Split by rows, then split cells cleanly while keeping "$1,500" or "85%" intact
+                const foundValues = [];
+                const lines = text.split(/\r?\n/);
 
-                const cellA1 = cols.at(0);
-                const cellB1 = cols.at(1);
-
-                if (cellA1 !== undefined) {
-                    document.getElementById('metric1').innerText = cellA1.replace(/^"|"$/g, '').trim();
+                for (const line of lines) {
+                    // Split on commas ONLY if they are outside of quotation marks
+                    const cells = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    for (const cell of cells) {
+                        const clean = cell.replace(/^"|"$/g, '').trim();
+                        if (clean !== '') {
+                            foundValues.push(clean);
+                        }
+                    }
                 }
-                if (cellB1 !== undefined) {
-                    document.getElementById('metric2').innerText = cellB1.replace(/^"|"$/g, '').trim();
+
+                // Display the first two non-empty cells found in the sheet
+                if (foundValues.length > 0) {
+                    document.getElementById('metric1').innerText = foundValues[0];
+                }
+                if (foundValues.length > 1) {
+                    document.getElementById('metric2').innerText = foundValues[1];
                 }
                 
             } catch (error) {
