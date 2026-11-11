@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0f172a; /* Clean dark slate background */
+            color: #f8fafc; /* Bright crisp text */
+            height: 100vh;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 2rem;
+            overflow: hidden;
+        }
+        .metric-card {
+            text-align: center;
+            flex: 1;
+        }
+        .label {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #94a3b8; /* Subdued label color */
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .value {
+            font-size: 10rem; /* Huge numbers for TV viewing */
+            font-weight: 800;
+            color: #38bdf8; /* Sharp sky blue color for the numbers */
+        }
+        .error {
+            font-size: 2rem;
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CARD 1 -->
+    <div class="metric-card">
+        <div class="label">Sales Today</div>
+        <div id="metric1" class="value">--</div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="metric-card">
+        <div class="label">Target</div>
+        <div id="metric2" class="value">--</div>
+    </div>
+
+    <script>
+        // PASTED LINK: Replace the URL below with your actual "Publish to web" CSV link
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1rD_EsgEZXS2pJVjsP2DOWTwtuS4EWbTwCvqx2wsyWPebk2MAQZBDrOEQI8CWFfd1vf4Po6VG5WpA/pub?gid=2024570392&single=true&output=csv';
+
+        async function updateDashboard() {
+            try {
+                const response = await fetch(csvUrl);
+                const data = await response.text();
+                
+                // Break the CSV into rows and cells
+                const rows = data.split('\n');
+                const firstRow = rows[0].split(',');
+
+                // Assigns cell A1 to metric1, and cell B1 to metric2
+                // Clean up quotes or hidden spacing from the sheet data
+                if(firstRow[0]) document.getElementById('metric1').innerText = firstRow[0].replace(/"/g, '').trim();
+                if(firstRow[1]) document.getElementById('metric2').innerText = firstRow[1].replace(/"/g, '').trim();
+                
+            } catch (error) {
+                console.error("Error fetching sheet data:", error);
+                document.getElementById('metric1').innerText = "Err";
+            }
+        }
+
+        // Run immediately when page loads
+        updateDashboard();
+
+        // Check for updates automatically every 1 hour (3600000 milliseconds)
+        setInterval(updateDashboard, 3600000);
+    </script>
+</body>
+</html>
