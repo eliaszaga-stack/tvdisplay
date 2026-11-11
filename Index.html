@@ -12,8 +12,8 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #0f172a; /* Clean dark slate background */
-            color: #f8fafc; /* Bright crisp text */
+            background-color: #0f172a;
+            color: #f8fafc;
             height: 100vh;
             display: flex;
             justify-content: space-around;
@@ -29,26 +29,24 @@
             font-size: 2.5rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #94a3b8; /* Subdued label color */
+            color: #94a3b8;
             margin-bottom: 1rem;
             font-weight: 600;
         }
         .value {
-            font-size: 10rem; /* Huge numbers for TV viewing */
+            font-size: 10rem;
             font-weight: 800;
-            color: #38bdf8; /* Sharp sky blue color for the numbers */
+            color: #38bdf8;
         }
     </style>
 </head>
 <body>
 
-    <!-- CARD 1: CELL A1 -->
     <div class="metric-card">
         <div class="label">Sales</div>
         <div id="metric1" class="value">--</div>
     </div>
 
-    <!-- CARD 2: CELL B1 -->
     <div class="metric-card">
         <div class="label">Progress</div>
         <div id="metric2" class="value">--</div>
@@ -59,15 +57,11 @@
 
         async function updateDashboard() {
             try {
-                // Prevent browser caching so the TV always gets fresh numbers
                 const freshUrl = csvUrl + '&t=' + Date.now();
                 const response = await fetch(freshUrl);
                 const text = await response.text();
                 
-                // Get the very first row (Row 1)
                 const firstLine = text.trim().split(/\r?\n/).at(0);
-                
-                // Split Row 1 into columns safely (handles commas inside numbers like "1,250")
                 const cols = firstLine.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
 
                 const cellA1 = cols.at(0);
@@ -86,10 +80,7 @@
             }
         }
 
-        // Run immediately when page loads
         updateDashboard();
-
-        // Check for updates automatically every 1 hour
         setInterval(updateDashboard, 3600000);
     </script>
 </body>
