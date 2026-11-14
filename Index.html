@@ -47,9 +47,13 @@
         <div class="label">Progress</div>
         <div id="metric2" class="value">--</div>
     </div>
+        <div class="metric-card">
+        <div class="label">Día</div>
+        <div id="metric3" class="value">--</div>
+    </div>
     <script>
         const SHEET_ID = '1ShhD9LRDOD1eTgtiv9rCNWT2_9IX_rzivTwDOqp0oEM';
-        const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Sales&range=A1:B1&headers=0`;
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Sales&range=A1:c1&headers=0`;
 
         async function updateDashboard() {
             try {
@@ -65,6 +69,7 @@
                 const num = parseFloat(cols[1].replace(/[^0-9.\-]/g, ''));
                 m2.classList.toggle('negative', num < 0);
                 m2.classList.toggle('positive', num > 0);
+                document.getElementById('metric3').innerText = cols[2] || '--';
             } catch (error) {
                 console.error(error);
                 document.getElementById('metric1').innerText = 'Err';
